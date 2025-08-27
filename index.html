@@ -7,68 +7,57 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- コンテンツ全体をdivで囲み、最初は非表示にする -->
     <div id="main-content" class="container mt-5 menu-container" style="display: none;">
         <h1 class="text-center mb-4">チェックリスト選択</h1>
-        <div id="checklist-menu" class="list-group">
-            <!-- チェックリストのリンクはJavaScriptによってここに自動生成されます -->
-        </div>
+        <div id="checklist-menu" class="list-group"></div>
     </div>
-
-    <!-- アクセスが拒否された場合に表示するメッセージ -->
     <div id="access-denied" class="container mt-5" style="display: none;">
         <h3 class="text-center text-danger">アクセスキーが無効です。</h3>
         <p class="text-center">正しいリンクからアクセスしてください。</p>
     </div>
 
     <script>
-        // --- 設定項目 ---
-        // ★ 秘密の合言葉
-        const SECRET_KEY = "_9zXkP2RjV_yWq7Bt"; 
+        const SECRET_KEY = "_9zXkP2RjV_yWq7Bt";
         
-        // --- 新しいチェックリストを追加する場合、この配列に情報を追加してください ---
         const availableChecklists = [
-            {
-                fileName: "キャンドポンプ異常対応_Checklist.html",
-                displayName: "キャンドポンプ異常対応"
-            },
-            {
-                fileName: "ギヤポンプ異常対応_Checklist.html",
-                displayName: "ギヤポンプ異常対応"
-            },
-            {
-                fileName: "インバーター異常対応_Checklist.html",
-                displayName: "インバーター異常対応"
-            }
-        ];
-        // --------------------------------------------------------------------
+    {
+        "fileName": "キャンドポンプ異常対応_Checklist.html",
+        "displayName": "キャンドポンプ異常対応"
+    },
+    {
+        "fileName": "ギヤポンプ異常対応_Checklist.html",
+        "displayName": "ギヤポンプ異常対応"
+    },
+    {
+        "fileName": "インバーター異常対応_Checklist.html",
+        "displayName": "インバーター異常対応"
+    },
+    {
+        "fileName": "ドライ式真空ポンプ異常対応_Checklist.html",
+        "displayName": "ドライ式真空ポンプ異常対応"
+    },
+    {
+        "fileName": "スクリューコンベアー異常対応_Checklist.html",
+        "displayName": "スクリューコンベアー異常対応"
+    }
+];
 
         document.addEventListener('DOMContentLoaded', function() {
-            // URLからパラメータを取得
             const urlParams = new URLSearchParams(window.location.search);
-            const accessKey = urlParams.get('pass'); // URLの ?pass=... の部分を取得
-
-            // 合言葉が一致するかチェック
+            const accessKey = urlParams.get('pass');
             if (accessKey === SECRET_KEY) {
-                // --- 認証成功時の処理 ---
                 document.getElementById('main-content').style.display = 'block';
                 const menuContainer = document.getElementById('checklist-menu');
                 let menuHtml = '';
-
                 if (availableChecklists.length > 0) {
                     availableChecklists.forEach(checklist => {
-                        menuHtml += `
-                            <a href="${checklist.fileName}" class="list-group-item list-group-item-action">
-                                ${checklist.displayName}
-                            </a>`;
+                        menuHtml += `<a href="${checklist.fileName}" class="list-group-item list-group-item-action">${checklist.displayName}</a>`;
                     });
                 } else {
                     menuHtml = '<p class="text-center">利用可能なチェックリストはありません。</p>';
                 }
                 menuContainer.innerHTML = menuHtml;
-
             } else {
-                // --- 認証失敗時の処理 ---
                 document.getElementById('access-denied').style.display = 'block';
             }
         });

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>「スクリューコンベアー」異常対応チェックリスト</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        @media print {
+            body > .container, .mt-3.container { display: none; }
+            #print-area { display: block !important; padding: 20px; }
+            .print-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+            .print-table th, .print-table td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+            .print-table th { background-color: #f2f2f2; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">「スクリューコンベアー」異常対応チェックリスト</h1>
+        <div id="checklist-container"></div>
+    </div>
+    <div class="mt-3 container">
+        <button id="prev-btn" class="btn btn-secondary">戻る</button>
+        <button id="next-btn" class="btn btn-primary">次へ</button>
+        <button id="exit-btn" class="btn btn-danger">終了</button>
+        <button id="print-btn" class="btn btn-info" style="display: none;">印刷</button>
+    </div>
+    <div id="print-area" style="display: none;"></div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js @1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        const checklistData = [
+    { "phase": 1, "phase_title": "Phase 1: 異常検知・緊急停止", "type": "checklist_with_status", "category": "異常検知", "item": "スクリューが回転しない、またはコンベアーが停止している", "item_id": "1_0", "linked_item_id": null },
+    { "phase": 1, "phase_title": "Phase 1: 異常検知・緊急停止", "type": "checklist_with_status", "category": "異常検知", "item": "搬送物が全く送られない、または搬送能力が著しく低下した", "item_id": "1_1", "linked_item_id": null },
+    { "phase": 1, "phase_title": "Phase 1: 異常検知・緊急停止", "type": "checklist_with_status", "category": "異常検知", "item": "駆動部や軸受部から「キーキー」「ゴリゴリ」といった異音、または金属接触音がある", "item_id": "1_2", "linked_item_id": null },
+    { "phase": 1, "phase_title": "Phase 1: 異常検知・緊急停止", "type": "checklist_with_status", "category": "異常検知", "item": "ケーシング（トラフ）や架台に異常な振動がある", "item_id": "1_3", "linked_item_id": null },
+    { "phase": 1, "phase_title": "Phase 1: 異常検知・緊急停止", "type": "checklist_with_status", "category": "異常検知", "item": "モーターの過負荷保護装置（サーマルリレー）が作動し、停止する", "item_id": "1_4", "linked_item_id": null },
+    { "phase": 1, "phase_title": "Phase 1: 異常検知・緊急停止", "type": "checklist_with_status", "category": "異常検知", "item": "軸封部やケーシングの接続部から搬送物が漏れている", "item_id": "1_5", "linked_item_id": null },
+    { "phase": 1, "phase_title": "Phase 1: 異常検知・緊急停止", "type": "checklist_with_status", "category": "異常検知", "item": "スクリュー羽根や軸が目視で曲がっている、または破損している", "item_id": "1_6", "linked_item_id": null },
+    { "phase": 1, "phase_title": "Phase 1: 異常検知・緊急停止", "type": "text_input", "category": "異常検知", "item": "その他", "item_id": "1_7", "linked_item_id": null },
+    { "phase": 1, "phase_title": "Phase 1: 異常検知・緊急停止", "type": "checklist", "category": "緊急停止措置", "item": "コンベアーの緊急停止ボタンを操作する。", "item_id": "1_8", "linked_item_id": null },
+    { "phase": 1, "phase_title": "Phase 1: 異常検知・緊急停止", "type": "checklist", "category": "緊急停止措置", "item": "制御盤の主電源を遮断し、施錠（ロックアウト）および表示（タグアウト）を実施する。", "item_id": "1_9", "linked_item_id": null },
+    { "phase": 1, "phase_title": "Phase 1: 異常検知・緊急停止", "type": "checklist", "category": "緊急停止措置", "item": "上流側（供給側）の機器を停止させ、コンベアーへの搬送物の供給を止める。", "item_id": "1_10", "linked_item_id": null },
+    { "phase": 1, "phase_title": "Phase 1: 異常検知・緊急停止", "type": "checklist", "category": "緊急停止措置", "item": "異常箇所周辺への立ち入りを禁止し、安全を確保する。", "item_id": "1_11", "linked_item_id": null },
+    { "phase": 2, "phase_title": "Phase 2-1: 故障原因調査（使用部門）", "type": "checklist_with_status", "category": "資材確認", "item": "搬送物の性状が変化している（例：水分が多い、固着しやすい、塊状になっている）", "item_id": "2_0", "linked_item_id": null },
+    { "phase": 2, "phase_title": "Phase 2-1: 故障原因調査（使用部門）", "type": "checklist_with_status", "category": "運転状況確認", "item": "搬送物の供給量が過大になっている", "item_id": "2_1", "linked_item_id": null },
+    { "phase": 2, "phase_title": "Phase 2-1: 故障原因調査（使用部門）", "type": "checklist_with_status", "category": "運転状況確認", "item": "投入口や排出口で搬送物が詰まっている（ブリッジ、閉塞）", "item_id": "2_2", "linked_item_id": null },
+    { "phase": 2, "phase_title": "Phase 2-1: 故障原因調査（使用部門）", "type": "checklist_with_status", "category": "外観・目視点検", "item": "スクリュー羽根とケーシングの間に異物（石、金属片、工具など）が噛み込んでいる", "item_id": "2_3", "linked_item_id": null },
+    { "phase": 2, "phase_title": "Phase 2-1: 故障原因調査（使用部門）", "type": "checklist_with_status", "category": "外観・目視点検", "item": "点検口カバーや安全カバーが緩んでいる、または変形して内部と接触している", "item_id": "2_4", "linked_item_id": null },
+    { "phase": 3, "phase_title": "Phase 3-1: 対策実施（使用部門）", "type": "checklist", "category": "資材確認", "item": "搬送物の性状を管理部署に報告し、改善を依頼する。", "item_id": "3_0", "linked_item_id": "2_0" },
+    { "phase": 3, "phase_title": "Phase 3-1: 対策実施（使用部門）", "type": "checklist", "category": "運転状況確認", "item": "上流側機器の設定を調整し、供給量を適正化する。", "item_id": "3_1", "linked_item_id": "2_1" },
+    { "phase": 3, "phase_title": "Phase 3-1: 対策実施（使用部門）", "type": "checklist", "category": "運転状況確認", "item": "投入口や排出口の詰まりを除去する。", "item_id": "3_2", "linked_item_id": "2_2" },
+    { "phase": 3, "phase_title": "Phase 3-1: 対策実施（使用部門）", "type": "checklist", "category": "外観・目視点検", "item": "（電源遮断後）噛み込んでいる異物を安全な手順で除去する。", "item_id": "3_3", "linked_item_id": "2_3" },
+    { "phase": 3, "phase_title": "Phase 3-1: 対策実施（使用部門）", "type": "checklist", "category": "外観・目視点検", "item": "カバーを正規の位置に修正し、ボルトを増し締めする。変形している場合は交換する。", "item_id": "3_4", "linked_item_id": "2_4" },
+    { "phase": 4, "phase_title": "Phase 2-2: 故障原因調査（メンテナンス部門）", "type": "checklist_with_status", "category": "駆動・伝達系統", "item": "駆動チェーンまたはベルトの張りが不適切（緩すぎ、張りすぎ）、または摩耗・損傷がある", "item_id": "4_0", "linked_item_id": null },
+    { "phase": 4, "phase_title": "Phase 2-2: 故障原因調査（メンテナンス部門）", "type": "checklist_with_status", "category": "駆動・伝達系統", "item": "減速機の油量不足、オイル漏れ、または本体が過熱している", "item_id": "4_1", "linked_item_id": null },
+    { "phase": 4, "phase_title": "Phase 2-2: 故障原因調査（メンテナンス部門）", "type": "checklist_with_status", "category": "駆動・伝達系統", "item": "モーターと減速機を繋ぐカップリング（軸継手）に芯ずれや損傷がある", "item_id": "4_2", "linked_item_id": null },
+    { "phase": 4, "phase_title": "Phase 2-2: 故障原因調査（メンテナンス部門）", "type": "checklist_with_status", "category": "軸受・軸封", "item": "中間軸受（ハンガーベアリング）に摩耗、焼き付き、破損がある", "item_id": "4_3", "linked_item_id": null },
+    { "phase": 4, "phase_title": "Phase 2-2: 故障原因調査（メンテナンス部門）", "type": "checklist_with_status", "category": "軸受・軸封", "item": "両端の軸受（エンドベアリング）に摩耗、焼き付き、異音、過熱がある", "item_id": "4_4", "linked_item_id": null },
+    { "phase": 4, "phase_title": "Phase 2-2: 故障原因調査（メンテナンス部門）", "type": "checklist_with_status", "category": "軸受・軸封", "item": "軸封装置（グランドパッキン等）が摩耗・劣化し、漏れが過大になっている", "item_id": "4_5", "linked_item_id": null },
+    { "phase": 4, "phase_title": "Phase 2-2: 故障原因調査（メンテナンス部門）", "type": "checklist_with_status", "category": "本体・スクリュー", "item": "スクリュー羽根が摩耗し、搬送能力が低下している", "item_id": "4_6", "linked_item_id": null },
+    { "phase": 4, "phase_title": "Phase 2-2: 故障原因調査（メンテナンス部門）", "type": "checklist_with_status", "category": "本体・スクリュー", "item": "スクリュー軸に曲がりやねじれがある", "item_id": "4_7", "linked_item_id": null },
+    { "phase": 4, "phase_title": "Phase 2-2: 故障原因調査（メンテナンス部門）", "type": "checklist_with_status", "category": "制御・電気系統", "item": "モーターの過負荷保護装置（サーマルリレー）の設定値が不適切", "item_id": "4_8", "linked_item_id": null },
+    { "phase": 4, "phase_title": "Phase 2-2: 故障原因調査（メンテナンス部門）", "type": "checklist_with_status", "category": "制御・電気系統", "item": "（回転検知器付の場合）回転センサーが搬送物付着等で誤作動している", "item_id": "4_9", "linked_item_id": null },
+    { "phase": 5, "phase_title": "Phase 3-2: 対策実施（メンテナンス部門）", "type": "checklist", "category": "駆動・伝達系統", "item": "チェーンまたはベルトの張りを調整するか、新品に交換する。", "item_id": "5_0", "linked_item_id": "4_0" },
+    { "phase": 5, "phase_title": "Phase 3-2: 対策実施（メンテナンス部門）", "type": "checklist", "category": "駆動・伝達系統", "item": "減速機のオイルを規定レベルまで補充・交換する。漏れ箇所を修理する。", "item_id": "5_1", "linked_item_id": "4_1" },
+    { "phase": 5, "phase_title": "Phase 3-2: 対策実施（メンテナンス部門）", "type": "checklist", "category": "駆動・伝達系統", "item": "カップリングのアライメント調整（芯出し）を行うか、損傷部品を交換する。", "item_id": "5_2", "linked_item_id": "4_2" },
+    { "phase": 5, "phase_title": "Phase 3-2: 対策実施（メンテナンス部門）", "type": "checklist", "category": "軸受・軸封", "item": "摩耗・破損した中間軸受を交換する。", "item_id": "5_3", "linked_item_id": "4_3" },
+    { "phase": 5, "phase_title": "Phase 3-2: 対策実施（メンテナンス部門）", "type": "checklist", "category": "軸受・軸封", "item": "摩耗・破損した両端の軸受を交換する。", "item_id": "5_4", "linked_item_id": "4_4" },
+    { "phase": 5, "phase_title": "Phase 3-2: 対策実施（メンテナンス部門）", "type": "checklist", "category": "軸受・軸封", "item": "劣化した軸封装置を新品に交換する。", "item_id": "5_5", "linked_item_id": "4_5" },
+    { "phase": 5, "phase_title": "Phase 3-2: 対策実施（メンテナンス部門）", "type": "checklist", "category": "本体・スクリュー", "item": "摩耗したスクリューを補修（肉盛溶接等）するか、新品に交換する。", "item_id": "5_6", "linked_item_id": "4_6" },
+    { "phase": 5, "phase_title": "Phase 3-2: 対策実施（メンテナンス部門）", "type": "checklist", "category": "本体・スクリュー", "item": "曲がりやねじれのあるスクリュー軸を修正するか、新品に交換する。", "item_id": "5_7", "linked_item_id": "4_7" },
+    { "phase": 5, "phase_title": "Phase 3-2: 対策実施（メンテナンス部門）", "type": "checklist", "category": "制御・電気系統", "item": "モーターの定格電流値に合わせて、過負荷保護装置の設定値を再設定する。", "item_id": "5_8", "linked_item_id": "4_8" },
+    { "phase": 5, "phase_title": "Phase 3-2: 対策実施（メンテナンス部門）", "type": "checklist", "category": "制御・電気系統", "item": "回転センサーの検出部を清掃するか、センサー自体を交換する。", "item_id": "5_9", "linked_item_id": "4_9" },
+    { "phase": 6, "phase_title": "Phase 4: 再起動前準備", "type": "checklist", "category": "復旧確認", "item": "交換した部品や修理箇所が、メーカーの仕様通りに正しく組付けられていることを確認する。", "item_id": "6_0", "linked_item_id": null },
+    { "phase": 6, "phase_title": "Phase 4: 再起動前準備", "type": "checklist", "category": "復旧確認", "item": "ケーシング（トラフ）内部に工具、部品、ウエスなどが放置されていないことを確認する。", "item_id": "6_1", "linked_item_id": null },
+    { "phase": 6, "phase_title": "Phase 4: 再起動前準備", "type": "checklist", "category": "安全確認", "item": "全ての点検口カバー、安全カバーが所定の位置に確実に取り付けられていることを確認する。", "item_id": "6_2", "linked_item_id": null },
+    { "phase": 6, "phase_title": "Phase 4: 再起動前準備", "type": "checklist", "category": "電源投入", "item": "関係者全員の安全を確認後、ロックアウト/タグアウトを正規の手順で解除する。", "item_id": "6_3", "linked_item_id": null },
+    { "phase": 6, "phase_title": "Phase 4: 再起動前準備", "type": "checklist", "category": "電源投入", "item": "制御盤の主電源を投入し、エラー表示などが出ていないことを確認する。", "item_id": "6_4", "linked_item_id": null },
+    { "phase": 6, "phase_title": "Phase 4: 再起動前準備", "type": "checklist", "category": "状態記録", "item": "故障内容、原因、対策、交換部品などを設備台帳や作業報告書に正確に記録する。", "item_id": "6_5", "linked_item_id": null },
+    { "phase": 7, "phase_title": "Phase 5: 試運転・正規運転", "type": "checklist", "category": "寸動運転", "item": "モーターを瞬間的に回転させ、回転方向が正しいこと、およびスクリューとケーシングの接触音がないことを確認する。", "item_id": "7_0", "linked_item_id": null },
+    { "phase": 7, "phase_title": "Phase 5: 試運転・正規運転", "type": "checklist", "category": "無負荷運転", "item": "搬送物を投入せずに5〜10分程度空運転し、異音、異常振動、軸受部の過熱がないことを確認する。", "item_id": "7_1", "linked_item_id": null },
+    { "phase": 7, "phase_title": "Phase 5: 試運転・正規運転", "type": "checklist", "category": "軽負荷運転", "item": "少量の搬送物を投入し、排出口までスムーズに搬送されることを確認する。", "item_id": "7_2", "linked_item_id": null },
+    { "phase": 7, "phase_title": "Phase 5: 試運転・正規運転", "type": "checklist", "category": "段階的な負荷上昇", "item": "搬送物の供給量を徐々に増やし、正規の供給量まで上げていく過程で、異常がないことを確認する。", "item_id": "7_3", "linked_item_id": null },
+    { "phase": 7, "phase_title": "Phase 5: 試運転・正規運転", "type": "checklist", "category": "性能指標確認", "item": "正規の運転状態で、モーターの電流値が定格内で安定していることを測定・確認する。", "item_id": "7_4", "linked_item_id": null },
+    { "phase": 7, "phase_title": "Phase 5: 試運転・正規運転", "type": "checklist", "category": "性能指標確認", "item": "規定の搬送能力（例：t/h）が出ていることを確認する。", "item_id": "7_5", "linked_item_id": null },
+    { "phase": 7, "phase_title": "Phase 5: 試運転・正規運転", "type": "checklist", "category": "正規運転・監視", "item": "正規運転移行後、軸受部や減速機の温度、振動、騒音レベルが基準値以下で安定していることを確認する。", "item_id": "7_6", "linked_item_id": null },
+    { "phase": 7, "phase_title": "Phase 5: 試運転・正規運転", "type": "checklist", "category": "正規運転・監視", "item": "運転開始後の一定時間（例：30分間）は重点的に監視し、異常の再発がないことを確認する。", "item_id": "7_7", "linked_item_id": null }
+];
+        const PRINT_TRIGGER_PHASE = 3;
+        let currentPhase = 1;
+        const maxPhase = Math.max(...checklistData.map(item => item.phase));
+        let checklistState = {};
+
+        function saveState() { 
+            sessionStorage.setItem('checklistState', JSON.stringify(checklistState)); 
+            sessionStorage.setItem('currentPhase', currentPhase);
+        }
+
+        function loadState() { 
+            const savedState = sessionStorage.getItem('checklistState');
+            const savedPhase = sessionStorage.getItem('currentPhase');
+            if (savedState) checklistState = JSON.parse(savedState);
+            if (savedPhase) currentPhase = parseInt(savedPhase, 10);
+        }
+
+        function renderCurrentPhase() {
+            const container = $('#checklist-container'); container.empty();
+            let itemsToShow = checklistData.filter(item => item.phase === currentPhase);
+            const phaseTitle = itemsToShow.length > 0 ? itemsToShow[0].phase_title : `Phase ${currentPhase}`;
+            if (currentPhase === 3 || currentPhase === 5) { itemsToShow = itemsToShow.filter(item => checklistState[item.linked_item_id] === 'problem'); }
+            container.append(`<h2 class="phase-title">${phaseTitle}</h2>`);
+            if (itemsToShow.length === 0 && (currentPhase === 3 || currentPhase === 5)) { container.append('<p>このフェーズで表示する項目はありません。前のフェーズで「問題あり」と選択された項目がありませんでした。</p>');
+            } else { const groupedItems = itemsToShow.reduce((acc, item) => { (acc[item.category] = acc[item.category] || []).push(item); return acc; }, {}); for (const category in groupedItems) { container.append(`<h3 class="category-title">${category}</h3>`); groupedItems[category].forEach(item => container.append(createItemHtml(item))); } }
+            updateButtonVisibility(); restoreState();
+        }
+
+        function createItemHtml(item) {
+            const { type, item_id, item: itemText, phase } = item; let interactiveElementHtml = ''; const buttonStyle = 'style="min-width: 95px;"';
+            if (type === 'checklist') { interactiveElementHtml = `<div class="btn-group-toggle" data-toggle="buttons"><label class="btn btn-outline-primary" ${buttonStyle} data-item-id="${item_id}" data-value="checked"><input type="checkbox" autocomplete="off"> 実施済み</label></div>`;
+            } else if (type === 'checklist_with_status') { if (phase === 1) { interactiveElementHtml = `<div class="btn-group btn-group-toggle" data-toggle="buttons"><label class="btn btn-outline-success" ${buttonStyle} data-item-id="${item_id}" data-value="applicable"><input type="radio" name="options-${item_id}" autocomplete="off"> 該当</label><label class="btn btn-outline-danger" ${buttonStyle} data-item-id="${item_id}" data-value="not_applicable"><input type="radio" name="options-${item_id}" autocomplete="off"> 非該当</label></div>`; } else { interactiveElementHtml = `<div class="btn-group btn-group-toggle" data-toggle="buttons"><label class="btn btn-outline-success" ${buttonStyle} data-item-id="${item_id}" data-value="ok"><input type="radio" name="options-${item_id}" autocomplete="off"> 問題なし</label><label class="btn btn-outline-danger" ${buttonStyle} data-item-id="${item_id}" data-value="problem"><input type="radio" name="options-${item_id}" autocomplete="off"> 問題あり</label></div>`; } 
+            } else if (type === 'checklist_with_na') { interactiveElementHtml = `<div class="btn-group btn-group-toggle" data-toggle="buttons"><label class="btn btn-outline-primary" ${buttonStyle} data-item-id="${item_id}" data-value="checked"><input type="radio" name="options-${item_id}" autocomplete="off"> 実施済み</label><label class="btn btn-outline-secondary" ${buttonStyle} data-item-id="${item_id}" data-value="not_applicable"><input type="radio" name="options-${item_id}" autocomplete="off"> 非該当</label></div>`;
+            } else if (type === 'text_input') { const labelHtml = `<label class="col-auto col-form-label pr-3">${itemText}</label>`; const textareaHtml = `<div class="col pl-0"><textarea class="form-control" rows="2" data-item-id="${item_id}" placeholder="具体的な内容を入力"></textarea></div>`; return `<div class="form-group row no-gutters align-items-center">${labelHtml}${textareaHtml}</div>`; }
+            return `<div class="checklist-item-row"><label class="form-check-label item-label">${itemText}</label>${interactiveElementHtml}</div>`;
+        }
+        
+        function restoreState() { for (const itemId in checklistState) { const value = checklistState[itemId]; $(`label[data-item-id="${itemId}"][data-value="${value}"]`).addClass('active').find('input').prop('checked', true); $(`textarea[data-item-id="${itemId}"]`).val(value); } validateCurrentPhaseCompletion(); updatePrintButtonVisibility(); }
+        function validateCurrentPhaseCompletion() { const requiredItems = checklistData.filter(item => { if (item.phase !== currentPhase || item.type === 'text_input') return false; return $(`[data-item-id="${item.item_id}"]`).length > 0; }); if (requiredItems.length === 0) { if (currentPhase < maxPhase) $('#next-btn').prop('disabled', false); return; } const allChecked = requiredItems.every(item => checklistState.hasOwnProperty(item.item_id)); $('#next-btn').prop('disabled', !allChecked); }
+        
+        function updatePrintButtonVisibility() {
+            // まだ印刷が有効化されていない場合、有効化の条件をチェック
+            if (sessionStorage.getItem('printEnabled') !== 'true') {
+                const requiredItems = checklistData.filter(item => {
+                    if (item.phase !== PRINT_TRIGGER_PHASE) return false;
+                    if (item.linked_item_id) { return checklistState[item.linked_item_id] === 'problem'; }
+                    return true;
+                });
+                const allChecked = requiredItems.every(item => checklistState.hasOwnProperty(item.item_id));
+                if (requiredItems.length > 0 && allChecked) {
+                    sessionStorage.setItem('printEnabled', 'true');
+                }
+            }
+            // 印刷が有効化されていれば、ボタンを表示
+            if (sessionStorage.getItem('printEnabled') === 'true') {
+                $('#print-btn').show();
+            } else {
+                $('#print-btn').hide();
+            }
+        }
+
+        function updateButtonVisibility() { $('#prev-btn').toggle(currentPhase > 1); $('#next-btn').toggle(currentPhase < maxPhase); $('#next-btn').prop('disabled', true); }
+
+        $(document).ready(function() {
+            loadState(); renderCurrentPhase();
+            $('#next-btn, #prev-btn').on('click', function() { if ($(this).is('#next-btn') && $(this).is(':disabled')) return; currentPhase += $(this).is('#next-btn') ? 1 : -1; saveState(); renderCurrentPhase(); });
+            $('#exit-btn').on('click', () => { if (confirm('チェックリストを終了し、メインメニューに戻りますか？')) { sessionStorage.clear(); window.location.href = 'index.html'; } });
+            $('#print-btn').on('click', function() {
+                const printContainer = $('#print-area');
+                let html = `<h1>「${document.title.replace('異常対応チェックリスト', '')}」実施結果</h1>`;
+                const valueMap = { 'checked': '実施済み', 'applicable': '該当', 'not_applicable': '非該当', 'ok': '問題なし', 'problem': '問題あり' };
+                const answeredPhaseNumbers = [...new Set(Object.keys(checklistState).map(itemId => checklistData.find(d => d.item_id === itemId)?.phase).filter(p => p).sort((a, b) => a - b))];
+
+                answeredPhaseNumbers.forEach(phaseNum => {
+                    // 修正点：DOMの存在チェックを削除し、checklistStateに存在する項目をすべて対象にする
+                    const phaseItems = checklistData.filter(d => d.phase === phaseNum && checklistState.hasOwnProperty(d.item_id));
+                    
+                    if (phaseItems.length > 0) {
+                        // linked_item_idを持つ項目は、リンク元が「問題あり」の場合のみ印刷対象とする
+                        const printableItems = phaseItems.filter(item => {
+                            if (item.linked_item_id) {
+                                return checklistState[item.linked_item_id] === 'problem';
+                            }
+                            return true;
+                        });
+
+                        if (printableItems.length > 0) {
+                            html += `<h2>${printableItems[0].phase_title}</h2><table class="print-table"><tr><th>項目</th><th>結果</th></tr>`;
+                            printableItems.forEach(item => {
+                                let result = checklistState[item.item_id];
+                                let resultText = valueMap[result] || result;
+                                let style = (result === 'problem') ? 'style="color: red;"' : '';
+                                html += `<tr><td>${item.item}</td><td ${style}>${resultText}</td></tr>`;
+                            });
+                            html += '</table>';
+                        }
+                    }
+                });
+                printContainer.html(html);
+                window.print();
+            });
+            $('#checklist-container').on('click', 'label.btn', function() { const label = $(this), itemId = label.data('item-id'); setTimeout(() => { if (label.find('input').is('[type=radio]')) { const activeValue = label.closest('.btn-group-toggle').find('.active').data('value'); if(activeValue) checklistState[itemId] = activeValue; else delete checklistState[itemId]; } else { if (label.hasClass('active')) checklistState[itemId] = label.data('value'); else delete checklistState[itemId]; } saveState(); validateCurrentPhaseCompletion(); updatePrintButtonVisibility(); }, 0); });
+            $('#checklist-container').on('input', 'textarea', function() { const input = $(this), itemId = input.data('item-id'), value = input.val(); if (value) checklistState[itemId] = value; else delete checklistState[itemId]; saveState(); });
+        });
+    </script>
+</body>
+</html>
